@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { BubblesSkeleton, SuggestionBubbles, type Bubble } from "@/components/SuggestionBubbles";
 import { ButtonLink } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { IconButton } from "@/components/ui/IconButton";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -48,6 +49,7 @@ export function ResultsScreen() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const [error, setError] = useState<{ message: string; retry: () => void } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!hydrated) return <ResultsSkeleton />;
   if (!scan) {
@@ -189,7 +191,7 @@ export function ResultsScreen() {
   };
 
   const deleteScan = () => {
-    if (!window.confirm("Delete this scan? Saved recipes stay in your library.")) return;
+    setConfirmDelete(false);
     actions.deleteScan(scan.id);
     router.replace("/");
   };
@@ -265,7 +267,7 @@ export function ResultsScreen() {
           overlay
           fallbackHref="/"
           actions={
-            <IconButton label="Delete scan" tone="glass" onClick={deleteScan}>
+            <IconButton label="Delete scan" tone="glass" onClick={() => setConfirmDelete(true)}>
               <Trash2 className="h-5 w-5" />
             </IconButton>
           }
@@ -390,6 +392,15 @@ export function ResultsScreen() {
       </div>
 
       <AskBar sticky onAsk={(q) => void ask(q)} disabled={!!busyId} />
+
+      <ConfirmDialog
+        open={confirmDelete}
+        title="Delete this scan?"
+        message="The photo and its suggestions will be removed. Recipes you saved stay in your library."
+        confirmLabel="Delete scan"
+        onConfirm={deleteScan}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </main>
   );
 }

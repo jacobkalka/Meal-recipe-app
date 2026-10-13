@@ -32,6 +32,7 @@ AI_MOCK=1 npm run dev
 | `npm run build` / `npm start` | Production build / server (the service worker for offline use only runs here) |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript, no emit |
+| `npm run build:artifact` | Single-page build for a claude.ai artifact (see below) |
 
 ## How it works
 
@@ -83,6 +84,14 @@ The grocery list is merged on-device first, so it's instant and works offline. W
 
 In production builds a service worker (`public/sw.js`) caches the page shells and static assets. Saved recipes, cooking mode and grocery lists keep working without a connection. AI features show a friendly "you're offline" message.
 
+## Run it as a Claude artifact (no API key)
+
+`npm run build:artifact` packs the same screens into one page (`dist-artifact/index.html` plus `seed/`) that can be published as a claude.ai artifact. In that build:
+
+- Next's router is replaced by an in-memory one (`artifact/shims/`), so routes and screens are unchanged.
+- AI calls go through the artifact's `sample` capability (`artifact/sample-api.ts`) on the viewer's own Claude account instead of `/api/*`, reusing the same prompts, zod schemas and post-processing. Publish it with `capabilities: {sample: {images: true}}` so photos can be sent.
+- React 18.3.1 loads from cdnjs (the only script host artifacts allow); everything else is inlined. Data stays in that browser's localStorage. There's no service worker, so offline mode is only in the Next.js deployment.
+
 ## Project structure
 
 ```
@@ -102,6 +111,7 @@ src/
     units.ts           scaling, US ⇄ metric, fraction formatting
     grocery.ts         merging + grouping
     seed.ts            example recipes shown before the first scan
+artifact/              single-page build for claude.ai artifacts (router shims, `sample` adapter, build script)
 public/
   seed/                example-recipe illustrations (replace with real photos, same file names)
   sw.js                service worker

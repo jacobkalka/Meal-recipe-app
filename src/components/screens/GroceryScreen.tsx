@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { CheckCircle } from "@/components/ui/CheckCircle";
 import { Chip } from "@/components/ui/Chip";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useOnline } from "@/hooks/useOnline";
 import { cn } from "@/lib/cn";
@@ -28,6 +29,7 @@ export function GroceryScreen() {
   const [adding, setAdding] = useState(false);
   const [newItem, setNewItem] = useState("");
   const [toast, setToast] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const key = sourcesKey(grocery.sources);
   const needsTidy = hydrated && online && grocery.sources.length > 0 && grocery.tidiedKey !== key && failedKey !== key;
@@ -284,17 +286,25 @@ export function GroceryScreen() {
             <Chip
               size="sm"
               tone="white"
-              onClick={() => {
-                if (window.confirm("Clear the whole grocery list?")) {
-                  actions.updateGrocery((l) => ({ ...l, sources: [], items: [], removedKeys: [], tidiedKey: null }));
-                }
-              }}
+              onClick={() => setConfirmClear(true)}
             >
               Clear list
             </Chip>
           </div>
         </>
       )}
+
+      <ConfirmDialog
+        open={confirmClear}
+        title="Clear the grocery list?"
+        message="Every item and recipe on the list will be removed."
+        confirmLabel="Clear list"
+        onConfirm={() => {
+          setConfirmClear(false);
+          actions.updateGrocery((l) => ({ ...l, sources: [], items: [], removedKeys: [], tidiedKey: null }));
+        }}
+        onCancel={() => setConfirmClear(false)}
+      />
 
       {toast && (
         <p role="status" className="fixed left-1/2 top-[max(1rem,env(safe-area-inset-top))] z-50 -translate-x-1/2 rounded-full bg-night px-4 py-2.5 text-sm font-semibold text-white shadow-float motion-safe:animate-slide-up">

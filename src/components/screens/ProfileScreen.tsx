@@ -6,6 +6,7 @@ import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Avatar } from "@/components/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Segmented } from "@/components/ui/Segmented";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useActions, useAppState } from "@/lib/data/store";
@@ -46,6 +47,7 @@ function ProfileForm({ initial }: { initial: Profile }) {
   const [draft, setDraft] = useState<Profile>(initial);
   const [staple, setStaple] = useState("");
   const [status, setStatus] = useState<string | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
 
   useEffect(() => {
@@ -187,11 +189,7 @@ function ProfileForm({ initial }: { initial: Profile }) {
           variant="secondary"
           className="mt-4 text-rust-600"
           icon={<Trash2 className="h-4 w-4" aria-hidden />}
-          onClick={async () => {
-            if (!window.confirm("Delete all scans, recipes, lists and settings on this device?")) return;
-            await actions.clearAll();
-            router.push("/");
-          }}
+          onClick={() => setConfirmClear(true)}
         >
           Clear all data
         </Button>
@@ -210,6 +208,19 @@ function ProfileForm({ initial }: { initial: Profile }) {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmClear}
+        title="Clear all data?"
+        message="This deletes every scan, recipe, grocery list and setting stored on this device."
+        confirmLabel="Delete everything"
+        onConfirm={async () => {
+          setConfirmClear(false);
+          await actions.clearAll();
+          router.push("/");
+        }}
+        onCancel={() => setConfirmClear(false)}
+      />
 
       {status && (
         <p role="status" className="fixed left-1/2 top-[max(1rem,env(safe-area-inset-top))] z-50 -translate-x-1/2 rounded-full bg-night px-4 py-2.5 text-sm font-semibold text-white shadow-float">

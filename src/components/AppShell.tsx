@@ -17,8 +17,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isCooking = pathname.startsWith("/cook");
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production" || !("serviceWorker" in navigator)) return;
-    navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    // NEXT_PUBLIC_NO_SW is set by the single-file artifact build, where service workers can't run.
+    if (process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_NO_SW === "1") return;
+    try {
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    } catch {
+      // some embedded contexts refuse service workers outright
+    }
   }, []);
 
   return (

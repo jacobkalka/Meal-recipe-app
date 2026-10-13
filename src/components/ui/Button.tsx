@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "dark" | "secondary" | "white" | "ghost";
+type Variant = "primary" | "dark" | "secondary" | "white" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
@@ -11,6 +11,7 @@ const VARIANTS: Record<Variant, string> = {
   secondary: "bg-chip text-ink hover:bg-line",
   white: "bg-white text-ink shadow-soft hover:bg-canvas",
   ghost: "text-ink hover:bg-chip",
+  danger: "bg-rust text-white hover:bg-rust-600",
 };
 
 const SIZES: Record<Size, string> = {

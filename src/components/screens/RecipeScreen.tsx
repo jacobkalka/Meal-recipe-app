@@ -225,13 +225,18 @@ function RecipeView({ recipe, defaultUnits }: { recipe: Recipe; defaultUnits: Un
   const share = async () => {
     const text = `${recipe.title}\n\n${recipe.ingredients.map((i) => `• ${formatAmount(convertAmount({ quantity: i.quantity, unit: i.unit }, factor, units))} ${i.name}`).join("\n")}\n\n${recipe.steps.map((s) => `${s.number}. ${localizeTemperatures(s.instruction, units)}`).join("\n")}`;
     try {
-      if (navigator.share) await navigator.share({ title: recipe.title, text });
-      else {
-        await navigator.clipboard.writeText(text);
-        setToast("Recipe copied");
+      if (navigator.share) {
+        await navigator.share({ title: recipe.title, text });
+        return;
       }
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return; // user closed the share sheet
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setToast("Recipe copied");
     } catch {
-      // user cancelled share
+      setToast("Couldn't share or copy from here");
     }
   };
 

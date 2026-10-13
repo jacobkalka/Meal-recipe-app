@@ -183,9 +183,9 @@ function example(id: string, recipe: RecipeAI, imageUrl: string, likes: number, 
 
 // Fixed timestamps keep server and client renders identical.
 export const SEED_RECIPES: Recipe[] = [
-  example("example-gnocchi", gnocchi, "/seed/gnocchi.svg", 286, 1_760_000_000_000),
-  example("example-fried-rice", friedRice, "/seed/fried-rice.svg", 80, 1_759_990_000_000),
-  example("example-tofu-curry", tofuCurry, "/seed/tofu-curry.svg", 69, 1_759_980_000_000),
+  example("example-gnocchi", gnocchi, "seed/gnocchi.svg", 286, 1_760_000_000_000),
+  example("example-fried-rice", friedRice, "seed/fried-rice.svg", 80, 1_759_990_000_000),
+  example("example-tofu-curry", tofuCurry, "seed/tofu-curry.svg", 69, 1_759_980_000_000),
 ];
 
 /** Exposed so the mock AI can return realistic content. */
